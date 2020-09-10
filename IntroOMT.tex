@@ -1,0 +1,43 @@
+\chapter{Optimization Modulo Theories and Constraint Programming}
+\label{cha:introOMT}
+
+\section{Constraint Programming and MiniZinc}
+
+Constraint Programming is an alternative paradigm for solving combinatorial problems. A Constraint Satisfaction Problem (CSP) is defined by a set of variables, each one with its domain of values, and a number of constraints, relations among a subset of the variables. A simple example of constraint is called ALLDIFFERENT: given some variables as input to this relation, it ensure no involved variable will assume the same value. The usual output of a CSP is a a valid assignment for each declared variables, if possible. The CSP has been extended to deal with the search of optimal solution with respect to some objective function, similarly to what happened to SMT: these problem are referred as Constraint Optimization Problems (COP).
+Due to the large amount of constraint available and its representational power, Constraint Programming popularity is growing in the last years and it is actually used in some formal verification related tasks. \\
+MiniZinc is the most popular high-level declarative language used to encode both CSP and COP instances. It is developed at Monash University in collaboration with Data61 Decision Sciences and the University of Melbourne. Each MiniZinc model first declares each variable needed to define the problem; optionally a value can be assigned, obtaining a parameter whose behaviour is similar to constants. Variables which are not initialized are known as decision variable and their value is determined by the solver, trying to satisfying the conditions that will follow. The next component of the model are the constraints, Boolean expression defining bounds to the value each decision variable can assume. Lastly we have a line expressing if we are working with CSP (so we only focus on knowing if there exists an assignment satisfying each variable domain and making true all constrains) or COP (in this case the user has to define the objective function to optimize and the direction of optimization). A simple example is provided in listing 1.2.
+
+\begin{lstlisting}[style=interfaces,caption=An example of MiniZinc encoding regarding the popular Stable Marriage Problem.]
+int: n;
+enum Man = anon_enum(n);
+enum Woman = anon_enum(n);
+array[Woman, Man] of int: rankWomen;
+array[Man, Woman] of int: rankMen;
+array[Man] of var Woman: wife;
+array[Woman] of var Man: husband;
+
+constraint forall (m in Man) (husband[wife[m]]=m);
+constraint forall (w in Woman) (wife[husband[w]]=w);
+constraint forall (m in Man, o in Woman) (
+     rankMen[m,o] < rankMen[m,wife[m]] -> 
+         rankWomen[o,husband[o]] < rankWomen[o,m] );
+constraint forall (w in Woman, o in Man) (
+     rankWomen[w,o] < rankWomen[w,husband[w]] -> 
+         rankMen[o,wife[o]] < rankMen[o,w] );
+         
+solve satisfy;
+\end{lstlisting}
+
+\section{Bridging CP and OMT}
+
+OMT presents some specific affinities that make it a valid candidate to deal with CSP: the availability of decision procedures for infinite-precision arithmetic, the efficient combination of
+Boolean and arithmetical reasoning and the ability to produce conflict explanations are shared between the two paradigms and it is not a case both are used to deal with formal verification problems. Achieving this task benefits the progression of the current state-of-the-art: the comparison between OMT solvers and CP tools on problems that do not belong to their original application domain extends their application in novel fields and speed up the process of finding critical points for future research. \\ 
+Despite that, transforming a CP instance into a OMT problem is not trivial; in particular there are multiple valid formulation of a CP problem into an OMT instance. Using one option instead of the others requires particular attention, since this choice could drastically affect performances (as shown in []). This situation represents the first issue hardening the bridging task. In addition to this difficulty, there are some MiniZinc features that requires a careful mapping to the SMT-LIB standard. In particular:
+
+\begin{itemize}
+    \item FlatZinc support three basic scalar types (int, float and bool) and two compound types (set and array). Compound types do not have a direct correspondence in the SMT-LIB standard; moreover integer and float can be represented using finite precision (using respectively bit-vector and floating point arithmetic) or applying the linear arithmetic theory.
+    \item MiniZinc introduced local and global constraints to express complex relations among variables. OMT solver currently do not introduce ad hoc decision procedures to manage them efficiently.
+    \item MiniZinc is capable of dealing with non-linear and transcendental functions, such as the logarithm or the cosine function. On the other hand, not every solver built on SMT-LIB support them.
+\end{itemize}
+
+\pagebreak

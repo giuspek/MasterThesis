@@ -1,0 +1,14 @@
+\chapter{Conclusions}
+\label{cha:conclusioni}
+
+\section{Future work}
+
+The first direction focuses on the introduction of OMT procedures dealing with non-linearity. At the current state, non-linear constraints, non-linear arithmetics and transcendental functions (such as the logarithm, the exponential and the sine function) are not managed by OMT solvers, in particular by OptiMathSAT. On the other hand, SMT already provides some approaches: in particular, MathSAT has recently been updated introducing them into its decision procedures. As a consequence, it will be useful to extend OptiMathSAT to achieve the optimization of non-linear objectives. The basic idea is to use the optimization routines to
+generate candidate solutions, then to evaluate them against the non-linear constraints in the problem using some advanced decision procedures. \\
+A second future direction to take into account would focus on bridging the gap between Constraint Programming and Optimization Modulo Theories, the open-source interface described in the previous chapters can be extended to efficiently manage each MiniZinc structure and procedure. To cover the full extent of CP standards some additions are required, such as defining an encoding based on Floating-Point Numbers or dealing with non-linear constraints and objectives (in this case the first future direction will help in completing the task). This may require a general review of the current implementation of the FlatZinc interface, so as to become modular and easy to extend.
+Moreover, we can improve the situation by developing a T-solver for the theory of sets, which is currently managed using a quite inefficient mix of Boolean and arithmetic constraints. 
+To conclude, another interesting issue concerns CP global constraints, constraints that capture a relation between a non-fixed number of variables. In particular, it would be necessary to study approaches to integrate dedicated procedures to the SMT and OMT framework emulating these constraints. \\
+ 
+
+
+

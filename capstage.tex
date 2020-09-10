@@ -1,0 +1,41 @@
+\chapter{The “Monolithic” Encoding Problem}
+
+The core of our problem revolves around the definition of the penalty function. A correlated task is the definition of a mapping between and qubits (placement) so that it can be placed into the Quantum Annealer, but it is outside of the interest of this dissertation and we will suppose we have it as input. We know that the penalty function has a pre-determined structure:
+
+\begin{equation}
+    P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = \theta_0 + \sum \theta_ix_i + \sum \theta_{ij} x_ix_j + \sum \theta_i a_i + \sum \theta_{ij} a_ix_j + \theta_{ij} a_ia_j
+\end{equation}
+
+We deliberately split segments referring to Boolean variable with the ones involving ancillas in order to simplify the next steps. Given this formulation, solving this task consists of finding the values of $\underline{\theta}$ so that:
+
+\begin{equation}
+    \forall \textbf{\underline{x}} \left[
+        \begin{array}{lr}
+            ( F(\underline{\textbf{x}}) \rightarrow \forall \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq 0 )) \land \\
+            ( F(\underline{\textbf{x}}) \rightarrow \exists \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = 0 )) \land \\
+            ( \neg F(\underline{\textbf{x}}) \rightarrow \forall \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq g_min )) \land \\
+            ( \neg F(\underline{\textbf{x}}) \rightarrow \exists \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = g_min )) \land \\
+        \end{array}
+    \right]
+\end{equation}
+
+The last row of equation (2.2) can be omitted if we are not searching an exact penalty function. Since this omission drastically reduce the computational time to search a valid solution, we will usually consider it omitted. \\
+Classic satisfiability theories do not deal with quantifiers, so it is essential to successfully remove them, obtaining and equivalent formula. The most popular approach adopted is \textbf{Shannon expansion}. Given an universal quantifier with respect to a set of variables, we can build an equivalent formula as the union of set of clauses whose structure is identical to the original structure, additionally setting the variables inside the considered set to one of their possible value. On the other hand, if we are presented an existential quantifier, we can recycle the previous algorithm but we will connect all the clauses using the AND operator instead of OR. Clearly the procedure is exponential (the more variables we consider, the more combinations of true/false value we can obtain). Once the expansion takes place, the original problem is reduced to the following SMT problem on linear real algebric theory:
+
+\begin{equation}
+    \Phi(\theta) =
+        \begin{array}{lr}
+            \bigwedge_{Z_i\in\textbf{\underline{x}},\textbf{\underline{a}}}(-2\leq\theta_i) \land (\theta_i\leq 2) \\
+            \land\  \bigwedge_{Z_i,Z_j\in\textbf{\underline{x}},\textbf{\underline{a}}, i<j}(-1\leq\theta_{ij}) \land (\theta_{ij}\leq 1) \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\top\}} \bigwedge_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq 0 \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\top\}} \bigvee_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = 0 \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\bot\}} \bigwedge_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq g_{min} \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\top\}} \bigvee_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = g_{min} \\
+            
+            
+        \end{array}
+\end{equation}
+
+\pagebreak
+
+
