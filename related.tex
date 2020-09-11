@@ -1,6 +1,8 @@
 \chapter{Related work}
 \label{cha:related}
 
+In this chapter will deepen on the SAT-to-Ising reduction problem, which has been proved to be useful when trying to exploit properties of quantum computing to reduce the computation time to solve SAT problems. We will discuss a preliminary algorithm that have been studied at University of Trento, distinguishing the procedure adopted to encode simple formulas from complex Boolean instances.
+
 \section{SAT-to-Ising}
 \label{sec:SATtoQUBO}
 
@@ -8,7 +10,7 @@ As already stated in the previous paragraphs, SAT main issue is the exponential 
 Computer scientists use Quantum Annealers as black-box algorithms which are fed to QUBO problems, whose formulation is similar but not identical to an Ising problem:
 
 \begin{equation}
-    FORMULA
+    H(\textbf{\underline{z}}) =\theta + \sum_{i \in V} h_iz_i + \sum_{\langle i,j\rangle \in E} J_{ij} z_iz_j
 \end{equation}
 
 As we can see qubits, biases and couplings are present in our formulation; in addition to them we consider the parameter $\theta_0$, which is called offset and falls into the range $(+\infty, -\infty)$. \\
@@ -54,7 +56,7 @@ The more ancillary variables we add to our formulation, the more complex the res
 Figure 1.3 shows the positioning of the obtained Ising Hamiltonian functions into a Chimera tile.
 \begin{figure}[t]
 	\begin{center}
-	\includegraphics{Ising1+2.png}
+	\includegraphics{images/Ising1+2.png}
 	\caption{On the left, a valid positioning of qubits into a Chimera tile for the formula $\varphi = x_1 \iff x_2$. On the right, a valid positioning for the formula $\varphi ' = x_3 \iff (x_1 \vee x_2)$. Both architectures are inspired by the penalty functions discussed in this paragraph.}
 	\end{center}
 \end{figure}
@@ -67,11 +69,10 @@ Converting a Boolean circuit into a QUBO formulation would apparently seem an ea
     \item \textbf{The number of qubits is not unlimited}: even though the recent architectures provides more than 2000 qubits, they are usually not enough to encode the majority of circuits.
     This is due by the nature of the two encoding: the number of qubits representing the input width and the circuit size are two different metrics for complexity, where the former is definitively bigger than the latter. 
     \item \textbf{The number of couplings is not unlimited}: as already mentioned in paragraph, each architecture can be interconnected to a limited number of other qubits. Consequently, the encoding process has to take into account this upper limit and, if more connections are required, map a Boolean variable into multiple qubits.
-    \item 
+    \item \textbf{Noise impacts the system performance}: the ideal condition of a quantum annealer would require a temperature of 0 K and to be heavily shielded by electro-magnetic rays. In reality these conditions are never met and D-Wave system are subject to performance degradation.
 \end{itemize}
 
-Because of the problems described above, advanced algorithms have been studied and tested in order to reduce the amount of qubits required during the reduction.
-
+Because of the problems described above, advanced algorithms have been studied and tested in order to reduce the amount of qubits required during the reduction of the SAT circuit.
 
 
 \section{Encoding complex Boolean formulas}
@@ -140,11 +141,13 @@ Given the nature of the penalty functions for $(x_i \iff x'_i)$, whose gap is 2,
 Combining the two properties above we can define the procedure to apply to retrieve penalty functions decomposing Boolean formulas into smaller chunks, easier to convert:
 
 \begin{itemize}
-    \item First we Tseitin-style decompose F(x) into an equi-satisfiable formula so that:
+    \item First we Tseitin-style decompose $F(x)$ into an equi-satisfiable formula so that:
     
     \begin{equation}
-        FORMULA
+        F*(\underline{x},\underline{y}) = \bigwedge^{m-1}_{i=1} 
+        (y_i \iff F(\underline{x}^i,\underline{y}^i)) \wedge F_m(\underline{x}^m,\underline{y}^m)
     \end{equation}
+    
     \item When two conjuncts $F_1$ and $F_2$ share one variable $y_j$, rename the second with a fresh new variable $y_i'$, conjoining $(y_i' \iff y_j)$.
     \item Compute the penalty function for each conjunct separately.
     \item Sum the penalty functions obtained in the previous step to obtain a single function. 
@@ -156,7 +159,7 @@ representation. As an example, a good pre-processing approach is using the and-i
 
 \begin{figure}[t]
 	\begin{center}
-	\includegraphics{LargeBool.PNG}
+	\includegraphics[width=\textwidth]{images/LargeBool.PNG}
 	\caption{A graphical representation of the encoding process for larger Boolean functions.}
 	\end{center}
 \end{figure}
