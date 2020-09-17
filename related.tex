@@ -56,10 +56,42 @@ The more ancillary variables we add to our formulation, the more complex the res
 Figure 1.3 shows the positioning of the obtained Ising Hamiltonian functions into a Chimera tile.
 \begin{figure}[t]
 	\begin{center}
-	\includegraphics{images/Ising1+2.png}
+	\includegraphics[width=.7\textwidth]{images/Ising1+2.png}
 	\caption{On the left, a valid positioning of qubits into a Chimera tile for the formula $\varphi = x_1 \iff x_2$. On the right, a valid positioning for the formula $\varphi ' = x_3 \iff (x_1 \vee x_2)$. Both architectures are inspired by the penalty functions discussed in this paragraph.}
 	\end{center}
 \end{figure}
+
+\subsection{Determining the penalty function}
+
+The task of retrieving the parameters characterizing the penalty function of a Boolean formula can be espressed by a SMT problem:
+
+\begin{equation}
+    \forall \textbf{\underline{x}} \left[
+        \begin{array}{lr}
+            ( F(\underline{\textbf{x}}) \rightarrow \forall \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq 0 )) \land \\
+            ( F(\underline{\textbf{x}}) \rightarrow \exists \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = 0 )) \land \\
+            ( \neg F(\underline{\textbf{x}}) \rightarrow \forall \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq g_min )) \land \\
+            ( \neg F(\underline{\textbf{x}}) \rightarrow \exists \underline{\textbf{a}}.(P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = g_min )) \land \\
+        \end{array}
+    \right]
+\end{equation}
+
+The last row of equation (2.2) can be omitted if we are not searching an exact penalty function. Since this omission drastically reduce the computational time to search a valid solution, we will usually consider it omitted. \\
+Classic satisfiability theories do not deal with quantifiers, so it is essential to successfully remove them, obtaining and equivalent formula. The most popular approach adopted is \textbf{Shannon expansion}. Given an universal quantifier with respect to a set of variables, we can build an equivalent formula as the union of set of clauses whose structure is identical to the original structure, additionally setting the variables inside the considered set to one of their possible value. On the other hand, if we are presented an existential quantifier, we can recycle the previous algorithm but we will connect all the clauses using the AND operator instead of OR. Clearly the procedure is exponential (the more variables we consider, the more combinations of true/false value we can obtain). Once the expansion takes place, the original problem is reduced to the following SMT problem on linear real algebric theory:
+
+\begin{equation}
+    \Phi(\theta) =
+        \begin{array}{lr}
+            \bigwedge_{Z_i\in\textbf{\underline{x}},\textbf{\underline{a}}}(-2\leq\theta_i) \land (\theta_i\leq 2) \\
+            \land\  \bigwedge_{Z_i,Z_j\in\textbf{\underline{x}},\textbf{\underline{a}}, i<j}(-1\leq\theta_{ij}) \land (\theta_{ij}\leq 1) \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\top\}} \bigwedge_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq 0 \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\top\}} \bigvee_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = 0 \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\bot\}} \bigwedge_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) \geq g_{min} \\
+            \land\ \bigwedge_{\{\textbf{\underline{x}}\in\{-1,1\}^n|F(\textbf{\underline{x}}=\top\}} \bigvee_{\textbf{\underline{a}}\in\{-1,1\}^h}P_F(\underline{\textbf{x}},\underline{\textbf{a}} | \underline{\theta}) = g_{min} \\
+        \end{array}
+\end{equation}
+
+While the SMT formulation will help us in determining if there exists a valid assignment of parameters to apply the SAT-to-Ising conversion, we recall from paragraph 2.1 that determining the highest value that $g_{min}$ can assume is a fundamental task; as a consequence, we can use equation 2.6 to define an OMT problem, where the cost function is simply $g_min$ and the direction of optimization is the search of the maximal.
 
 \section{Issues in Encoding for Quantum Annealers}
 
@@ -73,7 +105,6 @@ Converting a Boolean circuit into a QUBO formulation would apparently seem an ea
 \end{itemize}
 
 Because of the problems described above, advanced algorithms have been studied and tested in order to reduce the amount of qubits required during the reduction of the SAT circuit.
-
 
 \section{Encoding complex Boolean formulas}
 

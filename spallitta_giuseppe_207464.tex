@@ -14,13 +14,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % formato FRONTE RETRO
-\documentclass[epsfig,a4paper,11pt,titlepage,twoside,openany]{book}
+\documentclass[epsfig,a4paper,12pt,titlepage,twoside,openany]{book}
 \usepackage{epsfig}
 \usepackage{plain}
 \usepackage{setspace}
 \usepackage{listings} 
 \usepackage{subcaption}
 \usepackage{amsmath}
+\usepackage[table,xcdraw]{xcolor}
 \lstdefinestyle{interfaces}{
   float=tp,
   floatplacement=tbp,
@@ -129,12 +130,12 @@
       %
       % \input oppure \include
       %
-      \input{capitolo1}
+      \input{background}
       \input{related}
-      \input{capitolo2}
+      \input{analysis}
+      \input{contribution}
       \input{conclusion}
-      %\input{capitolo4}
-      
+
       
     \endgroup
 
