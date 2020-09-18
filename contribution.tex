@@ -44,12 +44,14 @@ To solve the issue, it was required to modify the \textit{place\_and\_route} lib
 
 \subsection{Re-assigning qubits}
 
+Once the needed data are stored and available, we can start to post-process the original encoding determining what functions might be extended and what chains are involved. For each pair of penalty functions we decide if there is a chain connecting them which can be split in two disjoint sub-sets of qubits without altering the correctness of the encoding of the original formula.
+
 \subsection{Recomputing penalty functions}
 
-The previously generated dictionaries collect the required data to determine, for each novel penalty function, the OMT . It is then necessary to build the quadruplets of data necessary to call the \textit{searchPF} function.
-We also tried to enhance the actual encoding, modifying the definition of the SMT file.
+In order to generate the OMT instance necessary to recompute the parameters on the enhanced penalty functions, we need to build the quadruplets of data necessary and call the \textit{searchPF} function using them.\\
+We also tried to enhance the actual encoding, modifying the definition of the SMT file. 
 
 \subsection{Updating the configuration}
 
-\pagebreak
+\newpage
 

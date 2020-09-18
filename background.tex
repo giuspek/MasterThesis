@@ -62,6 +62,17 @@ The algorithm described above, albeit working, it quite inefficient because of t
 
 While this approach drastically prunes the search space, we need to take into account the growth of space complexity required to store clauses. Heuristics have been proposed to determine when a learned clause is no more useful for the task in question and can be dropped.
 
+\subsection{Representing SAT using And-Inverter Graph}
+
+Each Boolean formula can be represented using different approaches. The structural implementation relevant to the scope of this dissertation is known as \textbf{And-Inverter Graph (AIG)}. An AIG is a directed, acyclic graph characterized by:
+
+\begin{itemize}
+    \item Terminal nodes, representing Boolean variables.
+    \item Two-input nodes, representing logical conjunctions
+    \item Marked edges, representing negation of a logical conjunction.
+\end{itemize}
+
+To convert a Boolean problem into an equivalent AIG representation, it is necessary to a series of 2-input AND gates and negations (the application of CNF and De Morgan's Laws helps us in achieving the result). 
 
 \section{MaxSAT}
 A subclass of SAT problems is called weighted maximum satisfiability, or MaxSAT. A MaxSAT formula can be seen as optimization extension of SAT: the formula is defined as a conjunction of clauses and, for each clause, a weight (a positive real number) is assigned. Given a Boolean assignment of its variables, a score is calculated considering the weights of all satisfied clauses. This addition change the perspective of the problem: every assignment can now be considered acceptable, since some clauses can be falsified. As a consequence MaxSat defines a new task: find a Boolean assignment so that the associated score is maximum. Also in this case multiple assignment can obtain the maximum score, resulting in multiple valid assignments. \\
@@ -194,5 +205,5 @@ Figure 1.3 shows the graphs representing both Chimera and Pegasus topologies, ra
 	\caption{A representation of the two architecture proposed by D-Wave, a $3*3$ tiles sub-graph of Chimera (on the left) and Pegasus (on the right).}
 \end{figure}
 
-\pagebreak
+\newpage
 
