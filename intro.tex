@@ -3,10 +3,25 @@
 
 \section{The problem}
 
+SAT is one of the eldest and most popular NP-hard problems in Computer Science. Multiple approaches have been proposed to solve SAT problems more efficiently, given its applications in real-life contexts. Among them, the usage of quantum annealers (capable to solve a specific subset of a single optimization problem) to speed up the search of a valid solution has arisen in the last years. Even though the transition from SAT instances to problem accepted by the annealers is not a trivial task, a preliminary algorithm has been developed by the University of Trento with the collaboration of the Canadian company D-Wave. \\
+The analysis of the original code, together with the ideas suggested at the end of the paper discussing the tool, raised some issues: in particular a side-effect of quantum computing, known as co-tunneling, negatively impacts the performances of the code in the search of an optimal solution satisfying the Boolean problem. Being able to determine a more stable encoding, not heavily affected by co-tunneling, will positively affect the performances of the tool and permit further investigations on the topic.
+
+
 \section{The solution}
+
+In this thesis, 
 
 \section{Structure of the thesis}
 
-This thesis is organized as follows: Chapter 2 will offer an overview about Optimization Modulo Theories, Constraint Programming and their relationship. The chapter will also offer an introduction to OMT applications in Quantum computing, focusing on the SAT-to-Ising encoding problem and how Optimization Modulo Theories are applied in this task. Chapter 2 discusses the definition of a novel algorithm to refine the QUBO encoding in order to obtain more stable encodings. Chapter 3 discusses some tests performed to the post-process approach, showing performances and results. Chapter 4 summarizes the most relevant results and gives the conclusions, additionally offering some cues for future research work.
+This thesis is divided into two main sections: Chapter 2 and 3 will provide the context necessary to understand the relevant concepts defining the backbone of the field we will analyze, while from chapter 4 to chapter 6 we will focus on the novel contributions produced and their application. The detailed organization of chapters is the following:
+
+\begin{itemize}
+    \item Chapter 2 will provide a comprehensive background on multiple logic problems such as SAT, SMT and OMT, offering a brief sight on fundamental algorithms and languages. It will also cover quantum computing and quantum annealing.
+    \item Chapter 3 will outline the current state-of-the-art regarding the SAT-to-Ising problem, discussing algorithms and limitations.
+    \item Chapter 4 will analyze the state-of-the-art tool; some tests have been reported to put in evidence some major issues and improvement points.
+    \item Chapter 5 will discuss the introduced improvements and their implementation, concentrating on the definition of the postprocess algorithm.
+    \item Chapter 6 will show performances and results regarding the novel approach. 
+    \item Chapter 7 will summarize the most relevant results and give the conclusions, additionally offering some cues for future research work.
+\end{itemize}
 
 \newpage
