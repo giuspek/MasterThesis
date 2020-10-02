@@ -9,7 +9,7 @@ The analysis of the original code, together with the ideas suggested at the end 
 
 \section{The solution}
 
-In this thesis, 
+In this thesis, a novel approach to refine the Ising encoding is discussed. The algorithm, from now on referred as \textbf{postprocessing}, focuses on updating the encoding using qubits part of chains between penalty functions. The main goals of postprocessing are the reduction of the length of these chains and, when possible, the obtainment of a more stable Ising formulation. The solution is accompanied by an analysis to the current state-of-the-art tool, which was necessary to determine the aspects requiring improvements, and an empirical evaluation to demonstrate progresses and limits of the proposed contributions.
 
 \section{Structure of the thesis}
 
@@ -19,9 +19,10 @@ This thesis is divided into two main sections: Chapter 2 and 3 will provide the 
     \item Chapter 2 will provide a comprehensive background on multiple logic problems such as SAT, SMT and OMT, offering a brief sight on fundamental algorithms and languages. It will also cover quantum computing and quantum annealing.
     \item Chapter 3 will outline the current state-of-the-art regarding the SAT-to-Ising problem, discussing algorithms and limitations.
     \item Chapter 4 will analyze the state-of-the-art tool; some tests have been reported to put in evidence some major issues and improvement points.
-    \item Chapter 5 will discuss the introduced improvements and their implementation, concentrating on the definition of the postprocess algorithm.
-    \item Chapter 6 will show performances and results regarding the novel approach. 
-    \item Chapter 7 will summarize the most relevant results and give the conclusions, additionally offering some cues for future research work.
+    \item Chapter 5 will talk about the CP-to-OMT problem, mentioning the current state-of-the-art interface, its shortcomings and the implementation of a novel interface.
+    \item Chapter 6 will discuss the introduced improvements and their implementation, concentrating on the definition of the postprocess algorithm.
+    \item Chapter 7 will show performances and results regarding the novel approach. 
+    \item Chapter 8 will summarize the most relevant results and give the conclusions, additionally offering some cues for future research work.
 \end{itemize}
 
 \newpage

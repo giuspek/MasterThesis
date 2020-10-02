@@ -3,35 +3,64 @@
 
 In this chapter we will discuss the state-of-the-art tool developed by the jointly work of University of Trento and D-Wave. More specifically we will emphasise critical points of the current version, suggesting possible direction to improve the performance of the algorithm.
 
-\section{The issue of co-tunnelling}
-
-The major issue while converting a SAT problem into a Ising instance is represented by the problem known as \textbf{co-tunneling}. Co-tunneling is a side-effect issue caused by the presence of long chains of qubits in the annealer's placement \cite{cotunneling}. [Discuss cotunneling in more details]
-
 \section{Studying the Ising encoding}
 
-To determine the behaviour of the placement algorithm and to easily understand how frequently long chains are generated, it was required to graphically represent the annealer architecture when applied to a SAT-to-Ising encoding task. \\
-A new script has been developed to accomplish this task, called \textit{graph\_to\_dot}. The first step was the building of a graph reflecting the architecture of the quantum annealer chosen at execution. Information about the topology of the network has been retrieved using \textbf{D-Wave NetworkX}, an extension of NetworkX providing tools and data for working with the D-Wave systems \cite{dwavenetx}. Data about the has been collected from the \textit{place\_and\_route} algorithm: for each AIG-related subformula the algorithm returns a subset of qubits to the graph and the values of weights extracted from the pre-computed libraries. Using this information, we choose a color for each penalty function and use it to determine the related qubits and the involved couplings in the graphical representation. The color of edges representing chains of a Boolean variable have been set to black. 
-An example of Boolean formula placement is shown in figure xx.
+To determine the behaviour of the placement algorithm, it was required to graphically represent the annealer architecture when applied to a SAT-to-Ising encoding task. \\
+A new script has been developed to accomplish this task, called \textit{graph\_to\_dot}. The first step was the building of a graph reflecting the architecture of the quantum annealer chosen at execution. Information about the topology of the network has been retrieved using \textbf{D-Wave NetworkX}, an extension of NetworkX providing tools and data for working with the D-Wave systems \cite{dwavenetx}. Data about the roles of each qubits has been collected from the \textit{place\_and\_route} algorithm: for each AIG-related subformula the algorithm returns a subset of qubits to the graph and the values of weights extracted from the pre-computed libraries. Using this information, we choose a color for each penalty function and use it to determine the related qubits and the involved couplings in the graphical representation. The color of edges representing chains of a Boolean variable have been set to black. 
+An example of Boolean formula placement resulting from the execution of \textit{place\_and\_route} is shown in figure 4.1.
 
 \begin{figure}[]
 	\begin{center}
-	\includegraphics[width=0.8\textwidth]{images/graph7.png}
+	\includegraphics[width=\textwidth]{images/graph7.png}
 	\caption{A graphical representation of the encoding of a benchmark problem, C17, into the Pegasus architecture.}
 	\end{center}
 \end{figure}
 
-The major issue visible from the figure is the presence of long chains of qubits. As already stated in paragraph 3.1, higher size of chains worsen the stability of the annealers in the search of the Hamiltonian final state. Each qubit belonging to the chain can be potentially more useful: unused arcs adjacent to them and set to 0 could be used to determine novel penalty functions. The results would be more complex structures that could help us in obtaining better penalty function, less prone to be subject to co-tunelling and with higher $gap_{min}$.
 The script was integrated to the original code as a debug option, permitting other users to test their encoding and better understanding the results behind the implemented procedures.
+
+\subsection{The issue of co-tunnelling}
+
+The major issue visible from figure 4.1 is the presence of long chains of qubits necessary to connect subformulas sharing a Boolean variable. Higher size of chains are the principal reason behind the phenomenon known as \textbf{co-tunneling}.  \\
+ Co-tunneling is a side-effect issue caused by the presence of long chains of qubits in the annealer's placement \cite{cotunneling}. Among its negative effects, the major one is the worsening of the stability of the annealers in the search of the Hamiltonian final state. \\
+ This side effect can be easily overcome cleverly rearranging the retrieved encoding. Each qubit belonging to the chain can be potentially more useful: unused arcs adjacent to them and set to 0 could be used to determine novel penalty functions. The results would be more complex structures that could help us in obtaining better penalty function, less prone to be subject to co-tunelling and with higher $gap_{min}$.
+ 
+ \subsection{The Pegasus genlib}
+ 
+ A second relevant issue emerged from the analysis of the Ising encoding. The number of penalty functions used to map the Boolean formulas into inside the Pegasus architecture is very small with respect to the one provided for Chimera. This is due to the novelty of the Pegasus architecture during the development at that time: as a result, the focus of the previous work was concentrated on the extension of the Chimera genlib file. While the two libraries are quite similar, there are some structural differences that prevent the user to interchangeably use one library for both architectures. Listing 4.1 provides the definition of a Boolean gate from each library, showing the most obvious differences the two. \\
+ 
+ \begin{lstlisting}[style=interfaces,caption=The definition of the penalty function \text{$A = B \wedge C$} according to the Chimera and Pegasus libraries. While the conversion of most data would be trivial (in particular weights of biases and couplings) it would be difficult to map Chimera encodings (which are mapped using Chimera tiles as basic unit) into Pegasus (which does not provide the concept of tile).]
+# Chimera genlib
+GATE gate4 4.000 A = (C) * (B);#{
+"R": [[0,0,0],[0,1,0],[0,0,1],[1,1,1]],
+"h": [[0.25],[-0.25],[-0.25],[0.25]],
+"J": [[0,0,-0.5,-0.75],[0,0,0.25,-0.5],[0,0,0,0],[0,0,0,0]],
+"en0": 1.5,"g": 1,"chimera": 1,"vP": [[[1],[3],[2]]],"dims": [1,1,2]}
+ PIN B INV 0 0 0 0 0 0
+ PIN C INV 0 0 0 0 0 0
+ 
+# Pegasus genlib
+GATE and 3.00 O = (I0 * I1);#{
+"off": 1.5, "(bias pos1)": 1.0, "(bias pos2)": -0.5, 
+"(bias pos3)": -0.5, "(bias pos4)": 0.0, "(coupl pos1 pos2)": -1.0,
+"(coupl pos1 pos3)": -1.0, "(coupl pos1 pos4)": 0.0,
+"(coupl pos2 pos3)": 0.5, "(coupl pos2 pos4)": 0.0, 
+"(coupl pos3 pos4)": 0.0, "pos1": 3.0, "pos2": 2.0, 
+"pos3": 1.0, "pos4": 0.0, "ancilla_used": 0.0}
+            PIN * INV 0 0 0 0 0 0
+\end{lstlisting}
+
+ Encoding the Ising problem using very small penalty functions is not convenient for our purpose: the probability of determining complex subgraphs using the wasted qubits from chains drastically decreases and so we obtain no increase in the definition of functions with higher $gap_{min}$. In order to solve this issue, an extension of the Pegasus library has been proposed and it will be further discussed in the following chapters.
+
 
 \section{The searchPF function}
 
-The previous section suggested the idea to recompute penalties function reducing the length of the chains. These nodes, used as ancillas and considering their unused couplings, could provide more complex encoding, reducing the co-tunneling effect and guaranteeing more energy stability. The tool already provide a class of algorithms to compute offset, biases and couplings of an Ising problem, given a topology and the Boolean function. Each function provided some specific constraints in order to satisfying properties such as getting the maximum $g_{min}$  The function relevant to the scope of this thesis, called \textbf{searchPF}, was the most suitable to our purpose, given its simplicity and its ease to be extended. \\
+The previous section suggests the idea to recompute penalties function reducing the length of the chains. These nodes, used as ancillas and considering their unused couplings, could provide more complex encoding, reducing the co-tunneling effect and guaranteeing more energy stability. The tool already provide a class of algorithms to compute offset, biases and couplings of an Ising problem, given a topology and the Boolean function. Each function provided some specific constraints in order to satisfying properties such as getting the maximum $g_{min}$  The function relevant to the scope of this thesis, called \textbf{searchPF}, was the most suitable to our purpose, given its simplicity and its ease to be extended. \\
 \textit{SearchPf} requires as input the following objects:
 
 \begin{itemize}
-    \item A graph representing the topology of the involved qubits. Graphs are created using the \textit{GraphViz} library, setting the nodes name as the integer in the range [1,$N$] with N the number of qubits.
+    \item A graph representing the topology of the involved qubits. Graphs are created using the \textit{GraphViz} library, setting the nodes name as the integer in the range [1,$N$] with N the number of qubits. 
     \item A function representing the Booolean formula we desire to map into the given graph.
-    \item Two integers $nx$ ans $na$, representing respectively the number of qubits representing the variables and the number of qubits working as ancillas.
+    \item Two integers $nx$ ans $na$, representing respectively the number of qubits representing the variables and the number of qubits working as ancillas. These parameters determine the role of each node of the graph: nodes whose label is in the range $[1, nx]$ represent Boolean variables, while the remaining nodes are used as ancillas.
 \end{itemize}
 
 In order to get the weights defining the penalty function, an Optimization Satisfiability problem is instantiated using the previously mentioned parameters. The problem is fed to OptiMathSAT, which returns in response an empty if no valid penalty functions has been found; otherwise, a dictionary containing the parameters value and the minimum gap is returned. Multiple constraints are set to map the problem into the SMT-LIB language:
@@ -39,7 +68,7 @@ In order to get the weights defining the penalty function, an Optimization Satis
 \begin{itemize}
     \item \textbf{Architecture constraints}: we ensure the resulting penalty function respects the topology of the given graph. As a consequence, some couplings need to be set to 0 a.
     \item \textbf{Range constraints}: As stated in section 1.5, values of biases and couplings need to be constrained so that they cannot violate their ranges. For each coupling and each bias an assert condition setting lower an upper bounds are added to the OMT encoding.
-    \item \textbf{Expansion gap constraints}: in order to retrieve the parameters of the Ising function we have to solve the  quantified OMT problem described in 
+    \item \textbf{Expansion gap constraints}: in order to retrieve the parameters of the Ising function we have to solve the  quantified OMT problem described in equation 3.6. The role of these constraints is the definition of multiple assertions to bind the values of biases and couplings so that they respect the Boolean formula used as reference.
 \end{itemize}
 
 The function has been heavily tested to learn its behaviour, its complexity and thus offering cues for improvements. First we studied the relation between the required time to obtain a solution to the OMT problem and the number involved variables, with the goal of determining an upper bound for the number of nodes so that the OMT problems can return their solution in a feasible amount of time to be applied in real-life applications. Table 3.1 shows the results of this analysis; we can see how we are bound to use a very low number of qubits.
@@ -62,7 +91,7 @@ This is not surprising: solving equation xx requires. More details will be provi
 We additionally implemented a small section of code to write the output of the procedure on a TXT file, giving us the opportunity to easily understand how \textit{searchPf} generates the problem and its inefficiencies. Some aspect have jumped to our eyes:
 
 \begin{itemize}
-    \item The number of coupling variables generated by the script were higher than the required ones. The architecture constraints tend to create a weight of each pair of qubits, then when the connection is not reflected in the topology of the graph its value is set to 0. While the correctness of the solution is achieved by this approach, an higher number of decision variables lengthens the time to get the solution.
+    \item The number of coupling variables generated by the script were higher than the required ones. The architecture constraints tends to create a weight of each pair of qubits, then when the connection is not reflected in the topology of the graph its value is set to 0. While the correctness of the solution is achieved by this approach, an higher number of decision variables lengthens the time to get the solution.
     \item When an instance is fed to the OMT solver, it tends to return solutions where the connections among ancillas get -1 as value. This result is in contradiction with our goal; most of these parameters should have a value different from -1 not to be part of the chain.
 \end{itemize}
 

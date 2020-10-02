@@ -105,7 +105,7 @@ Satisfiability Modulo Theories represents an extension to the SAT problem. The i
 
 Given the non-binary nature of these theories, novel approaches have been studied and tested to efficiently evaluate the satisfiability of a given formula. At the current state, the most widely used algorithm is known as \textbf{Lazy SMT solving}\cite{lazysmt}, whose core idea will be briefly explained to the reader for a better comprehension. Given an SMT formula and a subset of theories, we produce a Boolean abstraction formula in which each non-binary predicate is replaced by a binary variable. This new formula is then fed to a CDCL SAT solver and used to search a satisfiable assignment. When a satisfiable assignment is obtained, the corresponding set of T-literals that make up the original problem are fed to specialized theory solvers. If each clause if T-consistent, then we proved the satisfibility of the original formula; otherwise, the conflict clauses causing unsatisfiability are extracted and learned by the CDCL algorithm , permitting the evaluation of new assignments. The algorithm goes on until satisfiability is proved or no more assignment can be returned, proving its unsatisfiability. \\
 In order to be evaluated, the instance of a SMT problem has to be instantiated using a standard format. Regarding SMT encoding, SMT-LIB is the international initiative on top of which most SMT solvers are built. SMT-LIB does not only promote common input and output languages for SMT solvers; it also provides standard rigorous descriptions of background theories used in SMT systems and establishes benchmarks that can be used to test the solvers to highlight weaknesses and strengths. \\
-The syntax of SMT-LIB-based tools is quite simple. First, we define properties of the problem and solver options (for instance determine if we want to extract unsat cores). We can also set a theory, so that efficient algorithms and heuristics are applied during execution to improve performances. After this introduction, we declare constants, variables and functions. Then assertions are expressed: they bind the values of variables, restricting the range of satisfying solutions. A simple example is provided in listing 1.1. \\
+The syntax of SMT-LIB-based tools is quite simple. First, we define properties of the problem and solver options (for instance determine if we want to extract unsat cores). We can also set a theory, so that efficient algorithms and heuristics are applied during execution to improve performances. After this introduction, we declare constants, variables and functions. Then assertions are expressed: they bind the values of variables, restricting the range of satisfying solutions. A simple example is provided in listing 2.1. \\
 \begin{lstlisting}[style=interfaces,caption=An example of SMT-LIB encoding.]
 (set-info :smt-lib-version 2.6)
 (set-option :print-success false)
@@ -140,6 +140,44 @@ If permitted by the solver, we can also write multi-objective optimization probl
 \end{itemize}
 
 The jointly work between FBK and University of Trento gave birth to an Optimization Modulo Theories solver, \textit{OptiMathSAT} \cite{pa25}*.
+
+\section{Constraint Programming and MiniZinc}
+
+Constraint Programming is an alternative paradigm for solving combinatorial problems. A Constraint Satisfaction Problem (CSP) is defined by a set of variables, each one with its domain of values, and a number of constraints, relations among a subset of the variables. A simple example of constraint is called ALLDIFFERENT: given some variables as input to this relation, it ensure no involved variable will assume the same value. The usual output of a CSP is a a valid assignment for each declared variables, if possible. The CSP has been extended to deal with the search of optimal solution with respect to some objective function, similarly to what happened to SMT: these problem are referred as Constraint Optimization Problems (COP).
+Due to the large amount of constraint available and its representational power, Constraint Programming popularity is growing in the last years and it is actually used in some formal verification related tasks. \\
+MiniZinc is the most popular high-level declarative language used to encode both CSP and COP instances. It is developed at Monash University in collaboration with Data61 Decision Sciences and the University of Melbourne. Each MiniZinc model first declares each variable needed to define the problem; optionally a value can be assigned, obtaining a parameter whose behaviour is similar to constants. Variables which are not initialized are known as decision variable and their value is determined by the solver, trying to satisfying the conditions that will follow. The next component of the model are the constraints, Boolean expression defining bounds to the value each decision variable can assume. Lastly we have a line expressing if we are working with CSP (so we only focus on knowing if there exists an assignment satisfying each variable domain and making true all constrains) or COP (in this case the user has to define the objective function to optimize and the direction of optimization). A simple example is provided in listing 1.2.
+
+\begin{lstlisting}[style=interfaces,caption=An example of MiniZinc encoding regarding the popular Stable Marriage Problem.]
+int: n;
+enum Man = anon_enum(n);
+enum Woman = anon_enum(n);
+array[Woman, Man] of int: rankWomen;
+array[Man, Woman] of int: rankMen;
+array[Man] of var Woman: wife;
+array[Woman] of var Man: husband;
+
+constraint forall (m in Man) (husband[wife[m]]=m);
+constraint forall (w in Woman) (wife[husband[w]]=w);
+constraint forall (m in Man, o in Woman) (
+     rankMen[m,o] < rankMen[m,wife[m]] -> 
+         rankWomen[o,husband[o]] < rankWomen[o,m] );
+constraint forall (w in Woman, o in Man) (
+     rankWomen[w,o] < rankWomen[w,husband[w]] -> 
+         rankMen[o,wife[o]] < rankMen[o,w] );
+solve satisfy;
+\end{lstlisting}
+
+\subsection{Bridging CP and OMT}
+
+OMT presents some specific affinities that make it a valid candidate to deal with CSP: the availability of decision procedures for infinite-precision arithmetic, the efficient combination of
+Boolean and arithmetical reasoning and the ability to produce conflict explanations are shared between the two paradigms and it is not a case both are used to deal with formal verification problems. Achieving this task benefits the progression of the current state-of-the-art: the comparison between OMT solvers and CP tools on problems that do not belong to their original application domain extends their application in novel fields and speed up the process of finding critical points for future research. \\ 
+Despite that, transforming a CP instance into a OMT problem is not trivial; in particular there are multiple valid formulation of a CP problem into an OMT instance. Using one option instead of the others requires particular attention, since this choice could drastically affect performances (as shown in []). This situation represents the first issue hardening the bridging task. In addition to this difficulty, there are some MiniZinc features that requires a careful mapping to the SMT-LIB standard. In particular:
+
+\begin{itemize}
+    \item FlatZinc support three basic scalar types (int, float and bool) and two compound types (set and array). Compound types do not have a direct correspondence in the SMT-LIB standard; moreover integer and float can be represented using finite precision (using respectively bit-vector and floating point arithmetic) or applying the linear arithmetic theory.
+    \item MiniZinc introduced local and global constraints to express complex relations among variables. OMT solver currently do not introduce ad hoc decision procedures to manage them efficiently.
+    \item MiniZinc is capable of dealing with non-linear and transcendental functions, such as the logarithm or the cosine function. On the other hand, not every solver built on SMT-LIB support them.
+\end{itemize}
 
 \section{Quantum Annealer}
 \label{sec:quantum}
