@@ -1,3 +1,5 @@
+\part{Contributions}
+
 \chapter{Tool analysis}
 \label{cha:analysis}
 
@@ -54,16 +56,16 @@ GATE and 3.00 O = (I0 * I1);#{
 
 \section{The searchPF function}
 
-The previous section suggests the idea to recompute penalties function reducing the length of the chains. These nodes, used as ancillas and considering their unused couplings, could provide more complex encoding, reducing the co-tunneling effect and guaranteeing more energy stability. The tool already provide a class of algorithms to compute offset, biases and couplings of an Ising problem, given a topology and the Boolean function. Each function provided some specific constraints in order to satisfying properties such as getting the maximum $g_{min}$  The function relevant to the scope of this thesis, called \textbf{searchPF}, was the most suitable to our purpose, given its simplicity and its ease to be extended. \\
+The previous section suggests the idea to recompute penalties function reducing the length of the chains. These nodes, used as ancillas and considering their unused couplings, could provide more complex encoding, reducing the co-tunneling effect and guaranteeing more energy stability. The tool already provide a class of algorithms to compute offset, biases and couplings of an Ising problem. Each function provided some specific constraints in order to satisfying properties such as getting the maximum $g_{min}$  The function relevant to the scope of this thesis, called \textbf{searchPF}, was the most suitable to our purpose, given its simplicity and its ease to be extended. \\
 \textit{SearchPf} requires as input the following objects:
 
 \begin{itemize}
     \item A graph representing the topology of the involved qubits. Graphs are created using the \textit{GraphViz} library, setting the nodes name as the integer in the range [1,$N$] with N the number of qubits. 
     \item A function representing the Booolean formula we desire to map into the given graph.
-    \item Two integers $nx$ ans $na$, representing respectively the number of qubits representing the variables and the number of qubits working as ancillas. These parameters determine the role of each node of the graph: nodes whose label is in the range $[1, nx]$ represent Boolean variables, while the remaining nodes are used as ancillas.
+    \item Two integers $nx$ ans $na$, determining respectively the number of qubits representing the variables and the number of qubits working as ancillas. These parameters determine the role of each node of the graph: nodes whose label is in the range $[1, nx]$ represent Boolean variables, while the remaining nodes are used as ancillas.
 \end{itemize}
 
-In order to get the weights defining the penalty function, an Optimization Satisfiability problem is instantiated using the previously mentioned parameters. The problem is fed to OptiMathSAT, which returns in response an empty if no valid penalty functions has been found; otherwise, a dictionary containing the parameters value and the minimum gap is returned. Multiple constraints are set to map the problem into the SMT-LIB language:
+In order to get the weights defining the penalty function, an Optimization Satisfiability problem is instantiated using the previously mentioned parameters. The problem is fed to an OMT solver (in this case OptiMathSAT was chosen), which returns in response an empty dictionary if no valid penalty functions has been found; otherwise, a dictionary containing the parameters value and the minimum gap is returned. Multiple constraints are set to map the problem into the SMT-LIB language:
  
 \begin{itemize}
     \item \textbf{Architecture constraints}: we ensure the resulting penalty function respects the topology of the given graph. As a consequence, some couplings need to be set to 0 a.
@@ -71,7 +73,7 @@ In order to get the weights defining the penalty function, an Optimization Satis
     \item \textbf{Expansion gap constraints}: in order to retrieve the parameters of the Ising function we have to solve the  quantified OMT problem described in equation 3.6. The role of these constraints is the definition of multiple assertions to bind the values of biases and couplings so that they respect the Boolean formula used as reference.
 \end{itemize}
 
-The function has been heavily tested to learn its behaviour, its complexity and thus offering cues for improvements. First we studied the relation between the required time to obtain a solution to the OMT problem and the number involved variables, with the goal of determining an upper bound for the number of nodes so that the OMT problems can return their solution in a feasible amount of time to be applied in real-life applications. Table 3.1 shows the results of this analysis; we can see how we are bound to use a very low number of qubits.
+The function has been heavily tested to learn its behaviour, its complexity and thus offering cues for improvements. First we studied the relation between the required time to obtain a solution to the OMT problem and the number involved variables, with the goal of determining an upper bound for the number of nodes so that the OMT problems can return their solution in a feasible amount of time, to be applied in real-life applications. Table 4.1 shows the results of this analysis; we can see how we are bound to use a very low number of qubits.
 \begin{table}[]
 \centering
 \begin{tabular}{|c|c|}
@@ -87,11 +89,11 @@ N. of qubits & Running time \\ \hline
 \caption{A table showing the time required to retrieve the penalty function of $A = B \wedge C$ with an increasing number of variables, most of them used as ancillas.}
 \label{tab:my-table}
 \end{table}
-This is not surprising: solving equation xx requires. More details will be provided in the conclusive chapter, suggesting future approaches to overcome this limit. \\
+This is not surprising: equation 3.6 is subject to an exponential growth with respect to the number of involved variables. Currently there are no alternative to obtain an equivalent form of equation more efficiently. More details will be provided in the conclusive chapter, suggesting future approaches to overcome this limit. \\
 We additionally implemented a small section of code to write the output of the procedure on a TXT file, giving us the opportunity to easily understand how \textit{searchPf} generates the problem and its inefficiencies. Some aspect have jumped to our eyes:
 
 \begin{itemize}
-    \item The number of coupling variables generated by the script were higher than the required ones. The architecture constraints tends to create a weight of each pair of qubits, then when the connection is not reflected in the topology of the graph its value is set to 0. While the correctness of the solution is achieved by this approach, an higher number of decision variables lengthens the time to get the solution.
+    \item The number of coupling variables generated by the script were higher than the required ones. The architecture constraints tends to create a weight of each pair of qubits, then when the connection is not reflected in the topology of the graph its value is set to 0. While the correctness of the solution is achieved by this approach, an higher number of decision variables is not desirable since it lengthens the time to get the solution.
     \item When an instance is fed to the OMT solver, it tends to return solutions where the connections among ancillas get -1 as value. This result is in contradiction with our goal; most of these parameters should have a value different from -1 not to be part of the chain.
 \end{itemize}
 
