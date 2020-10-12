@@ -60,7 +60,7 @@ The previous section suggests the idea to recompute penalties function reducing 
 \textit{SearchPf} requires as input the following objects:
 
 \begin{itemize}
-    \item A graph representing the topology of the involved qubits. Graphs are created using the \textit{GraphViz} library, setting the nodes name as the integer in the range [1,$N$] with N the number of qubits. 
+    \item A graph representing the topology of the involved qubits. Graphs are created using the \textit{GraphViz} library \cite{graphviz}, setting the nodes name as the integer in the range [1,$N$] with N the number of qubits. 
     \item A function representing the Booolean formula we desire to map into the given graph.
     \item Two integers $nx$ ans $na$, determining respectively the number of qubits representing the variables and the number of qubits working as ancillas. These parameters determine the role of each node of the graph: nodes whose label is in the range $[1, nx]$ represent Boolean variables, while the remaining nodes are used as ancillas.
 \end{itemize}

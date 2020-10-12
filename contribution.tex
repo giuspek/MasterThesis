@@ -5,12 +5,12 @@ This chapter will suggest a novel algorithm to refine the encoding and retrieve 
 
 \section{Algorithm}
 
-The goal of postprocessing is the re-definition of the Ising encoding, modifying offset, biases and couplings between qubits so that the longer chains are reduced in size. Since all nodes that make up the chain are linked by couplings whose value is $-1$, we will ensure to modify these weights; in addition to that, we will force these nodes in using their unused couplings when possible, . \\
-The only way to achieve this task while not altering the original SAT formulation is to re-compute the scores of each chunk of the simplified formula, defining new OMT problems that involve the additional qubits. In more details, given two penalty functions encoded in a quantum annealer architecture linked by a chain:
-\begin{figure}[b]
+The goal of postprocessing is the re-definition of the Ising encoding, modifying offset, biases and couplings between qubits so that the longer chains are reduced in size. Since all nodes that make up the chain are linked by couplings whose value is $-1$, we will ensure to modify these weights; in addition to that, we will force these nodes in using their unused couplings when possible. \\
+The only way to achieve this task not altering the original SAT formulation is to re-compute the scores of each chunk of the simplified formula, defining new OMT problems that involve the additional qubits. In more details, given two penalty functions encoded in a quantum annealer architecture linked by a chain:
+\begin{figure}[t]
 	\begin{center}
-	\includegraphics[width=\textwidth]{images/PostAlg.png}
-	\caption{A graphical representation of the postprocessing algorithm involving two general penalty functions (F and G) linked by a chain (blue edges). It is important to notice the swap of role between the original node representing the shared variable to ensure consistency of the variable's value between functions.}
+	\includegraphics[]{images/Immaginetesi.png}
+	\caption{A graphical representation of the postprocessing algorithm involving two general penalty functions (F and G) linked by a chain (blue edges). It is important to notice the swap of role between the original node representing the shared variable to ensure consistency of the variable's truth assignment between functions.}
 	\end{center}
 \end{figure}
 
@@ -45,7 +45,7 @@ To solve the issue, it was required to modify the \textit{place\_and\_route} lib
 \subsection{Re-assigning qubits}
 
 Once the needed data are stored and available, we can start to post-process the original encoding determining what functions might be extended and what chains are involved. For each pair of penalty functions we have to determine if there is a chain connecting them which can be split in two disjoint sub-sets of qubits without altering the correctness of the encoding of the original formula. 
-These operations have been implemented in the \textit{postprocessing} function. \\
+These operations have been implemented in the \textit{postprocessing} function. Its behaviour is explained in algorithm 1.\\
 Given the set of all penalty functions, we take each possible pair and verify if there are Boolean variables shared by both of them using the field \textit{field} of the data structure \textit{penalties}. If the resulting set is empty, we can discard the couple of functions and move on the next one. In the opposite case, we call the function \textit{get\_chain} that will try to identify the chains suitable to be split. We identify the first node of the chain, represented by the qubit associated to the specified Boolean variable and contained into the \textit{core\_qubits} of the first function. From that point we recall Pegasus arcitecture from the \textbf{DwaveNetworkX} library and check if there are adjacent nodes belonging to the same chain. The new node is then added to the possible final answer and used as new middle point to search adjacent nodes, until we reach a qubits which is also part of the \textit{core\_qubits} of the second penalty function. There are some specific cases requiring exceptional handling, including:
 
 \begin{itemize}
@@ -54,7 +54,7 @@ Given the set of all penalty functions, we take each possible pair and verify if
     \item Lastly we have also to check the case in which the starting and the final node overlap. In this case we do not start the search and immediately have to return the empty list, otherwise we will reach the error case.
 \end{itemize}
 
-In the case a non-empty list is returned by \textit{get\_chain}, we can proceed to assign these qubits to the two penalty functions. In order to better organize the collection of the next data, a novel dictionary has been generated, called \textit{penalties\_post}. It will contain three fields for each penalty function:
+The backbone of \textit{get\_chain} is shown in algorithm 2. In the case a non-empty list is returned by \textit{get\_chain}, we can proceed to assign these qubits to the two penalty functions. In order to better organize the collection of the next data, a novel dictionary has been generated, called \textit{penalties\_post}. It will contain three fields for each penalty function:
 
 \begin{itemize}
     \item \textit{nodes}, containing the list of additional qubits that we will assign to that function.
@@ -62,7 +62,97 @@ In the case a non-empty list is returned by \textit{get\_chain}, we can proceed 
     \item \textit{swap}, containing pairs of qubits whose role (ancilla/Boolean variable) need to be swapped in order to maintain the exactness of the resulting encoding, as discussed in figure 5.1.
 \end{itemize}
 
-Starting from the non-empty list of qubits, the middle point is chosen from the chain, so that two disjoint sets of nodes are generated. Qubits from the first set are progressively assigned to the first penalty function; moreover we check if there are connections among other qubits from the same penalty function not contemplated by the original problem and, when discovered, added to the \textit{edges} field. Not every node can be added: we recall from table 4.1 that at the current state we have an upper bound on the number of managed qubits to avoid deadlock points. Consequently, an additional check has been considered while scanning the list of nodes so that the upper bound is never outdated.
+Starting from the non-empty list of qubits, the middle point is chosen from the chain, so that two disjoint sets of nodes are generated. Qubits from the first set are progressively assigned to the first penalty function; moreover we check if there are connections among other qubits from the same penalty function not contemplated by the original problem and, when discovered, added to the \textit{edges} field. Not every node can be added: we recall from table 4.1 that at the current state we have an upper bound on the number of managed qubits to avoid deadlock points. Consequently, an additional check has been considered while scanning the list of nodes so that the upper bound is never outdated. 
+
+\begin{algorithm}
+\DontPrintSemicolon
+\KwData{$penalties$ containing data about each function; \\ \qquad $chains$ containing info qubits involved in chains; \\ \qquad
+$map\_arcs$ containing Pegasus graph.}
+\KwResult{$p\_post$ containing data about each postprocessed function;}
+\Begin{
+$ub \longleftarrow 10$\;
+$p\_post \longleftarrow \{\}$\;
+$couples \longleftarrow \{\}$\;
+\tcc{collect all possible chains between penalty functions}
+\For{$f \in penalties.keys()$}{
+    \For{$g \in penalties.keys()$}{
+        $shared\_vars = penalties[f]["variables"] \cap penalties[g]["variables"]$\;
+        \If{$shared\_vars \neq \emptyset$}{
+            $couples[(f,g)] \longleftarrow shared\_vars$
+        }
+    }
+}
+\For{$c \in couples$}{
+    $order\_chain = get\_chain(c, chains, penalties)$\;
+    $midpoint = \left\lfloor \frac{len(order\_chain)}{2}\right\rfloor$\;
+    \tcc{manipulate the first penalty function}
+    \For{$i \in 1$ \KwTo $midpoint$}{
+        \If{$len(penalties[c[0]]) + len(p\_post[c[0]]) > ub$}{
+            \textbf{break}\;
+        }
+        $swap\_index \longleftarrow i$\;
+        $p\_post[c[0]]["nodes"] \longleftarrow p\_post[c[0]]["nodes"] + order\_chain[i]$\;
+        $adj\_nodes = map\_arcs.adjs(order\_chain[i])$\;
+        \For{$qubit \in adj\_nodes$}{
+            $p\_post[c[0]]["edges"] \longleftarrow p\_post[c[0]]["edges"] + (order\_chain[i], qubit)$\;
+        }
+    }
+    $p\_post[c[0]]["swap"] \longleftarrow (order\_chain[0], order\_chain[swap\_index])$\;
+    \tcc{manipulate the second penalty function}
+    \For{$j \in len(order\_chain) - 2$ \KwTo $midpoint$ \KwBy $-1$}{
+        \If{$len(penalties[c[1]]) + len(p\_post[c[1]]) > ub$}{
+            \textbf{break}\;
+        }
+        $swap\_index \longleftarrow i$\;
+        $p\_post[c[1]]["nodes"] \longleftarrow p\_post[c[1]]["nodes"] + order\_chain[j]$\;
+        $adj\_nodes = map\_arcs.adjs(order\_chain[j])$\;
+        \For{$qubit \in adj\_nodes$}{
+            $p\_post[c[1]]["edges"] \longleftarrow p\_post[c[1]]["edges"] + (order\_chain[j], qubit)$\;
+        }
+    }
+    $p\_post[c[1]]["swap"] \longleftarrow (order\_chain[len(order\_chain)-1], order\_chain[swap\_index])$\;
+    }
+\Return $p\_post$
+}
+\caption{postprocessing: qubits re-assignment}
+\end{algorithm}
+
+\begin{algorithm}
+\DontPrintSemicolon
+\KwData{$penalties$ containing data about each function; \\ \qquad $chains$ containing info qubits involved in chains; \\ \qquad
+$map\_arcs$ containing Pegasus graph; \\ \qquad
+$c$ containing the two functions involved and their shared variables}
+\KwResult{$ch\_res$ containing the list of qubits for each shared variable;}
+\Begin{
+    $ch\_res \longleftarrow {}$ 
+    \For{$var \in c$}{
+        $start = chains[var] \cap penalties[c[0]]["nodes"]$\;
+        $finish = chains[var] \cap penalties[c[1]]["nodes"]$\;
+        \tcc{if the two functions are overimposed, we move on}
+        \If{$start == finish$}{
+            \Return []
+        }
+        $ch\_res[var] \longleftarrow start$\;
+        $middle \longleftarrow map\_arcs.adjs(start) \cap chains[var]$\;
+        \While{$middle$ \textbf{not in} $finish$}{
+            $temp \longleftarrow map\_arcs.adjs(middle) \cap chains[var]$\;
+            \tcc{if we stop prematurely or multiple paths arise, we stop}
+            \If{$len(temp) \neq 1$}{
+                $ch\_res[var] \longleftarrow []$\;
+                \textbf{break}
+            }
+            $middle \longleftarrow temp$\;
+            $ch\_res[var] \longleftarrow used\_nodes + middle$
+        }
+        \tcc{If the chain, we would case issue to the general correctness, so we skip it}
+        \If{$len(ch\_res[var]) \neq len(chains[var])$}{
+            $ch\_res[var] \longleftarrow []$
+        }
+    }
+    \Return $ch\_res$
+}
+\caption{get\_chain}
+\end{algorithm}
 
 \subsection{Recomputing penalty functions}
 

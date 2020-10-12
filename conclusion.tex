@@ -1,13 +1,31 @@
 \chapter{Conclusions}
 \label{cha:conclusioni}
 
-From the analysis discussed in the second part of this thesis, we see how the development of a postprocessing procedure can benefit the quantum encoding and provides more stable encoding. The most interesting success is represented by the capability of obtaining new penalty functions w simply re-arranging some qubits
+In this thesis a novel approach to improve the definition of the SAT-to-Ising conversion has been heavily discussed. We have seen how the development of a postprocessing procedure can benefit the quantum encoding and provides more stable encodings. The most interesting success is represented by the capability of obtaining new penalty functions with higher minimum gaps simply re-arranging some qubits; this could guarantee an higher probability to search a final state satisfying the Boolean formula in the case. Albeit being still in a preliminary state, we have understood how this approach could lead to promising developments. We also proved how the average length of chains and the number of "wasted" chains drastically decrease when postprocessed, . \\
+In addition to the postprocessing algorithm, the analysis of the old version of the tool put into evidence some minor issues that have led to further advancements. For instance, the extension of the Pegasus genlib file helped us in encoding more complex formulas using a more compact representation, reducing the number of chains and thus further stabilizing the resulting Hamiltonian problem. These aspects prove how the SAT-to-Ising problem is still in its primordial stages and there are considerable scope for improvements.
 
 \section{Future work}
 
+Even though a great deal of extensions and updates have been introduced, multiple ideas have aroused in the final stages, supporting the idea of new paths to follow to further improve the problem of SAT-to-Ising and related topics.
+
+\subsection{Advancing SAT-to-Ising}
+
+The first direction concentrates on expanding the current encoding algorithm and the postprocessing procedure. Some of these suggestions have been already mentioned in the previous chapters, in particular during the tool analysis. A list of possible challenges to address in the future concerns:
+
+\begin{itemize}
+    \item In the field of automated theorem proving and SMT, novel
+techniques for solving quantified SMT formulas are emerging. It is thus possible to investigate these techniques for solving directly quantified formulas,
+avoiding thus the expensive Shannon expansion which is applied when discussing equation 3.5.
+    \item While Boolean function decomposition and minimization are mature classical subjects, those algorithms can probably be im-
+proved by taking into consideration the specifics of the embedding (placement and routing onto a QA hardware graph) that follow them.
+    \item Recently D-Wave announced the details of its next-generation computation hardware, which it is called "Advantage" and released a set of white papers that describe some of the machine's performance characteristics \cite{advantage}. The new architecture will have 5.000 qubits arranged in a 15x15x12 lattice. The number of couplings is drastically higher than Pegasus, with about 40000 connections. Lastly, D-Wave concentrated on lowering the noise of individual qubits, reaching a reduction by about three- to four-fold. Both the old algorithm and the postprocessing procedure should be tested on the new architecture, leading to better performances and offering cues for additional extensions.
+\end{itemize}
+
+\pagebreak
+
 \subsection{Enhancing CP-to-OMT}
 
-A second future direction to take into account would focus on bridging the gap between Constraint Programming and Optimization Modulo Theories. The open-source interface described in the previous chapters can be extended to efficiently manage each MiniZinc structure and procedure. To cover the full extent of CP standards some additions are required, such as defining an encoding based on Floating-Point Numbers or dealing with non-linear constraints and objectives (in this case the first future direction will help in completing the task). This may require a general review of the current implementation of the FlatZinc interface, so as to become modular and easy to extend.
+The second future direction to take into account focuses on bridging the gap between Constraint Programming and Optimization Modulo Theories. The open-source interface described in the previous chapters can be extended to efficiently manage each MiniZinc structure and procedure. To cover the full extent of CP standards some additions are required, such as defining an encoding based on Floating-Point Numbers or dealing with non-linear constraints and objectives. This may require a general review of the current implementation of the FlatZinc interface, so as to become modular and easy to extend.
 Moreover, we can improve the situation by developing a T-solver for the theory of sets, which is currently managed using a quite inefficient mix of Boolean and arithmetic constraints. 
 To conclude, another interesting issue concerns CP global constraints, constraints that capture a relation between a non-fixed number of variables. In particular, it would be necessary to study approaches to integrate dedicated procedures to the SMT and OMT framework emulating these constraints. \\
  

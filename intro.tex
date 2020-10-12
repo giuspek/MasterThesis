@@ -3,13 +3,16 @@
 
 \section{The problem}
 
-SAT is one of the eldest and most popular NP-hard problems in Computer Science. Multiple approaches have been proposed to solve SAT problems more efficiently, given its applications in real-life contexts. Among them, the usage of quantum annealers (capable to solve a specific subset of a single optimization problem) to speed up the search of a valid solution has arisen in the last years. Even though the transition from SAT instances to problem accepted by the annealers is not a trivial task, a preliminary algorithm has been developed by the University of Trento with the collaboration of the Canadian company D-Wave. \\
+SAT is one of the eldest and most popular NP-hard problems in Computer Science. Its synergy with a wide range of practical applications has been demonstrated to offer remarkable improvements. A non-exhaustive list of successful collaborations involves program verification \cite{pa14}, model checking \cite{pa29} and AI planning \cite{aiplan}. Multiple approaches have been proposed to solve SAT problems more efficiently. Among them, the usage of quantum annealers (capable to solve a specific subset of a single optimization problem) to speed up the search of a valid solution has arisen in the last years. Even though the transition from SAT instances to problem accepted by the annealers is not a trivial task \cite{pa22}, a preliminary algorithm has been developed by the University of Trento with the collaboration of the Canadian company D-Wave. \\
 The analysis of the original code, together with the ideas suggested at the end of the paper discussing the tool, raised some issues: in particular a side-effect of quantum computing, known as co-tunneling, negatively impacts the performances of the code in the search of an optimal solution satisfying the Boolean problem. Being able to determine a more stable encoding, not heavily affected by co-tunneling, will positively affect the performances of the tool and permit further investigations on the topic.
 
 
 \section{The solution}
 
-In this thesis, a novel approach to refine the Ising encoding is discussed. The algorithm, from now on referred as \textbf{postprocessing}, focuses on updating the encoding using qubits part of chains between penalty functions. The main goals of postprocessing are the reduction of the length of these chains and, when possible, the obtainment of a more stable Ising formulation. The solution is accompanied by an analysis to the current state-of-the-art tool, which was necessary to determine the aspects requiring improvements, and an empirical evaluation to demonstrate progresses and limits of the proposed contributions.
+In this thesis, a novel approach to refine the Ising encoding is heavily discussed. The algorithm, from now on referred as \textbf{postprocessing}, focuses on updating the encoding using qubits part of chains between penalty functions. The main goals of postprocessing are the reduction of the length of these chains and, when possible, the obtainment of a more stable Ising formulation. This thesis will focus on its theoretical fundaments and its actual implementation, highlighting the most delicate design choices.  The definition of the solution is accompanied by an analysis to the current state-of-the-art tool, which was necessary to determine the aspects requiring improvements, and an empirical evaluation to demonstrate progresses and limits of the proposed contributions. \\
+A supplementary contribution is also mentioned in this dissertation discussing the development of an open-source interface, \textbf{FZN2OMT}, enabling the conversion from Constraint Programming to SMT and OMT problems. While not directly connected with SAT, this interface could open new paths in the study of applicability of Quantum computing: the majority of intermediate tasks necessary to determine the encoding of Boolean formulas rely on OMT and SMT and thus could benefit from the extension.
+
+\newpage
 
 \section{Structure of the thesis}
 
@@ -19,12 +22,12 @@ This thesis is divided into two main sections: Chapter 2 and 3 will provide the 
     \item Chapter 2 will provide a comprehensive background on multiple logic problems such as SAT, SMT and OMT, offering a brief sight on fundamental algorithms and languages. It will also cover quantum computing and quantum annealing.
     \item Chapter 3 will outline the current state-of-the-art regarding the SAT-to-Ising problem, discussing algorithms and limitations.
     \item Chapter 4 will analyze the state-of-the-art tool; some tests have been reported to put in evidence some major issues and improvement points.
-    \item Chapter 5 will talk about the CP-to-OMT problem, mentioning the current state-of-the-art interface, its shortcomings and the implementation of a novel interface.
-    \item Chapter 6 will discuss the introduced improvements and their implementation, concentrating on the definition of the postprocess algorithm.
-    \item Chapter 7 will show performances and results regarding the novel approach. 
+    \item Chapter 5 will discuss the effective contribution introduced in the newer version, concentrating on the definition of the postprocessing algorithm and its implementation.
+    \item Chapter 6 will show performances and results regarding the novel approach. 
+    \item Chapter 7 will talk about the CP-to-OMT problem, mentioning the current state-of-the-art interface, its shortcomings and the implementation of a novel interface.
     \item Chapter 8 will summarize the most relevant results and give the conclusions, additionally offering some cues for future research work.
 \end{itemize}
 
 \newpage
 
-\part{Motivations, Background, State-of-the-art}
+\part{Background and State of the art}

@@ -35,7 +35,7 @@ Each variable is embedded in a class representing the basic unit of a formula, c
 
 The definition of constants is identical to the procedure for decision variables, with an additional step to link the symbol with its value. This association was managed creating an unordered map using the name as key and the assigned parameter as value. \\
 All these newly created instances were collected defining a container class, \textbf{TermManager}.
-A brief graph summing up the hierarchy of classes and their role in the program is shown in figure xx. 
+A brief graph summing up the hierarchy of classes and their role in the program is shown in figure 7.1. 
 
 \begin{figure}
     \centering
@@ -46,12 +46,13 @@ A brief graph summing up the hierarchy of classes and their role in the program 
 
 \subsection{Introducing basic behaviour}
 
-The fundamental task that the interface is required to satisfy is the encoding of FlatZinc constraints into SMT-LIB equivalent assertions. Some of these constraints (the MiniZinc manual calls them \textbf{FlatZinc builtins}) define simple relations among variables; the other constraints, \textit{global constraints}, represent high-level modelling abstractions, for which many solvers implement special, efficient inference algorithms and require more complex encoding. Each constraint is managed with the 
+The fundamental task that the interface is required to satisfy is the encoding of FlatZinc constraints into SMT-LIB equivalent assertions. Some of these constraints (the MiniZinc manual calls them \textbf{FlatZinc builtins}) define simple relations among variables; the other constraints, \textit{global constraints}, represent high-level modelling abstractions, for which many solvers implement special, efficient inference algorithms and require more complex encoding. Each constraint is managed thanks to the introduction of a dedicate function. When all required arguments are constants, then it is quicker to evaluate the constraint using C datatypes and return as answer a SMT-LIB Bool variable. This is particularly useful when testing the correctness of the constraints and the parsing of the input file. Another special case happens when every arguments but the output decision variable are constant: in that case we , returning a nee Term whose type is linked to the input variables. As a general rule, if all variables are Integer, then we can create an Integer variables; on the other cases we choose Float in order not to lose precision nor information. This approach slightly reduces the amount of Boolean variables used and speed up the search of a valid solution. \\
+In the remaining cases we translate the constraint into an assertion which will bind the value of the variables.
 
 \subsection{Extending FZN2OMT}
 
 Once the essential behaviours were implemented, we decided to extend the project adding that would increase its popularity and its usage.\\
-First of all, OptiMathSAT is only one of the list of the OMT solvers available to the final users. Other popular solvers are z3 \cite{z3prover} and Barcelogic \cite{barcelogic}, each one with their strengths and weaknesses. All these solvers support the SMT-LIB standard, but the format accepted by each tool presents some minor differences with respect to the others. Even though the community is currently working in removing these differences and provide a unified format to simply test a single instance of a problem in multiple tools, at the moment we need to adapt the SMT-LIB encoding to satisfy the semantic of each solver. Some of the most evident differences involve:
+First of all, OptiMathSAT is only one of the list of the OMT solvers available to the final users. Other popular solvers are z3 \cite{pa17} and Barcelogic \cite{barcelogic}, each one with their strengths and weaknesses. All these solvers support the SMT-LIB standard, but the format accepted by each tool presents some minor differences with respect to the others. Even though the community is currently working in removing these differences and provide a unified format to simply test a single instance of a problem in multiple tools, at the moment we need to adapt the SMT-LIB encoding to satisfy the semantic of each solver. Some of the most evident differences involve:
 
 \begin{itemize}
     \item The setting of the background theory to exploit for a problem: since the SMT-LIB admits, for each tool we have to make sure a supported logic is passed, otherwise an error will be returned an the execution aborted. 

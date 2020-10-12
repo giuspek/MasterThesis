@@ -1,7 +1,7 @@
 \chapter{Related work}
 \label{cha:related}
 
-In this chapter we will deepen on the SAT-to-Ising reduction problem, which has been proved to be interesting when trying to exploit properties of quantum computing to reduce the computation time to solve SAT problems. We will discuss a preliminary algorithm that have been studied at University of Trento, distinguishing the procedure adopted to encode simple formulas from complex Boolean instances.
+In this chapter we will deepen on the SAT-to-Ising reduction problem, which has been proved to be interesting when trying to exploit properties of quantum computing to reduce the computation time to solve SAT problems. We will discuss a preliminary algorithm that have been studied at University of Trento whose core theoretical framework is discussed in \cite{pa12}, distinguishing the procedure adopted to encode simple formulas from complex Boolean instances.
 
 \section{SAT-to-Ising}
 \label{sec:SATtoQUBO}
@@ -91,7 +91,7 @@ Classic satisfiability theories do not deal with quantifiers, so it is essential
         \end{array}
 \end{equation}
 
-While the SMT formulation will help us in determining if there exists a valid assignment of parameters to apply the SAT-to-Ising conversion, we recall from paragraph 3.1 that determining the highest value that $g_{min}$ can assume is a fundamental task; as a consequence, we can use equation 3.6 to define an OMT problem, where the cost function is simply $g_min$ and the direction of optimization is the search of the maximal value.
+While the SMT formulation will help us in determining if there exists a valid assignment of parameters to apply the SAT-to-Ising conversion, we recall from paragraph 3.1 that determining the highest value that $g_{min}$ can assume is a fundamental task; as a consequence, we can use equation 3.6 to define an OMT problem, where the cost function is simply $g_{min}$ and the direction of optimization is the search of the maximal value.
 
 \section{Issues in Encoding for Quantum Annealers}
 
@@ -196,7 +196,8 @@ representation. As an example, a good pre-processing approach is using the and-i
 \end{figure}
 
 \begin{itemize}
-    \item Use the library of pre-computed penalty functions to map each function part of the decomposed and simplified SAT formula into a valid Ising encoding. This phase is known as standard cell mapping.
+    \item Use the library of pre-computed penalty functions to map each function part of the decomposed and simplified SAT formula into a valid Ising encoding. This phase is known as standard cell mapping. It depends from the DAG-aware minimization, which attempts to find an AIG equivalent to the original with a minimal number of nodes by repeatedly identifying small
+sub-graphs that can be replaced with a smaller sub-graph without affecting the output \cite{pa15}.
     \item Now it is necessary to embed the entire formula onto the QA hardware. To achieve this task, we first assign a disjoint subgraph of the QA hardware graph to each penalty function chosen in the previous step.
     \item Lastly we need to ensure that qubits representing the same variable are chained so that they can assume the same value when given as input to the annealer: we can accomplish it using penalty functions in the form $1 - x_1x_2$, where $x_1$ and $x_2$ are qubits representing the same variable. This step is a direct consequence to formula 3.11.
 \end{itemize}

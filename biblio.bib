@@ -64,23 +64,30 @@
   url = {https://link.aps.org/doi/10.1103/PhysRevB.82.060512}
 }
 
-@InProceedings{StefanoPaperQuantum,
-author="Bian, Zhengbing
-and Chudak, Fabian
-and Macready, William
-and Roy, Aidan
-and Sebastiani, Roberto
-and Varotti, Stefano",
-editor="Dixon, Clare
-and Finger, Marcelo",
-title="Solving SAT and MaxSAT with a Quantum Annealer: Foundations and a Preliminary Report",
-booktitle="Frontiers of Combining Systems",
-year="2017",
-publisher="Springer International Publishing",
-address="Cham",
-pages="153--171",
-abstract="Quantum annealers (QA) are specialized quantum computers that minimize objective functions over discrete variables by physically exploiting quantum effects. Current QA platforms allow for the optimization of quadratic objectives defined over binary variables, that is, they solve quadratic unconstrained binary optimization (QUBO) problems. In the last decade, QA systems as implemented by D-Wave have scaled with Moore-like growth. Current architectures provide 2048 sparsely-connected qubits, and continued exponential growth is anticipated.",
-isbn="978-3-319-66167-4"
+@article{StefanoPaperQuantum,
+title = "Solving SAT (and MaxSAT) with a quantum annealer: Foundations, encodings, and preliminary results",
+journal = "Information and Computation",
+pages = "104609",
+year = "2020",
+issn = "0890-5401",
+doi = "https://doi.org/10.1016/j.ic.2020.104609",
+url = "http://www.sciencedirect.com/science/article/pii/S0890540120300973",
+author = "Zhengbing Bian and Fabian Chudak and William Macready and Aidan Roy and Roberto Sebastiani and Stefano Varotti",
+keywords = "Quantum annealing (QA), Quadratic unconstrained binary optimization (QUBO), Ising model, Satisfiability modulo theories, Optimization modulo theories, SAT, MaxSAT, Chimera graph",
+abstract = "Quantum annealers (QAs) are specialized quantum computers that minimize objective functions over discrete variables by physically exploiting quantum effects. Current QA platforms allow for the optimization of quadratic objectives defined over binary variables (qubits), also known as Ising problems. In the last decade, QA systems as implemented by D-Wave have scaled with Moore-like growth. Current architectures provide 2048 sparsely-connected qubits, and continued exponential growth is anticipated, together with increased connectivity. We explore the feasibility of such architectures for solving SAT and MaxSAT problems as QA systems scale. We develop techniques for effectively encoding SAT –and, with some limitations, MaxSAT– into Ising problems compatible with sparse QA architectures. We provide the theoretical foundations for this mapping, and present encoding techniques that combine offline Satisfiability and Optimization Modulo Theories with on-the-fly placement and routing. Preliminary empirical tests on a current generation 2048-qubit D-Wave system support the feasibility of the approach for certain SAT and MaxSAT problems."
+}
+
+@article{varotti,
+title = "Solving SAT (and MaxSAT) with a quantum annealer: Foundations, encodings, and preliminary results",
+journal = "Information and Computation",
+pages = "104609",
+year = "2020",
+issn = "0890-5401",
+doi = "https://doi.org/10.1016/j.ic.2020.104609",
+url = "http://www.sciencedirect.com/science/article/pii/S0890540120300973",
+author = "Zhengbing Bian and Fabian Chudak and William Macready and Aidan Roy and Roberto Sebastiani and Stefano Varotti",
+keywords = "Quantum annealing (QA), Quadratic unconstrained binary optimization (QUBO), Ising model, Satisfiability modulo theories, Optimization modulo theories, SAT, MaxSAT, Chimera graph",
+abstract = "Quantum annealers (QAs) are specialized quantum computers that minimize objective functions over discrete variables by physically exploiting quantum effects. Current QA platforms allow for the optimization of quadratic objectives defined over binary variables (qubits), also known as Ising problems. In the last decade, QA systems as implemented by D-Wave have scaled with Moore-like growth. Current architectures provide 2048 sparsely-connected qubits, and continued exponential growth is anticipated, together with increased connectivity. We explore the feasibility of such architectures for solving SAT and MaxSAT problems as QA systems scale. We develop techniques for effectively encoding SAT –and, with some limitations, MaxSAT– into Ising problems compatible with sparse QA architectures. We provide the theoretical foundations for this mapping, and present encoding techniques that combine offline Satisfiability and Optimization Modulo Theories with on-the-fly placement and routing. Preliminary empirical tests on a current generation 2048-qubit D-Wave system support the feasibility of the approach for certain SAT and MaxSAT problems."
 }
 
  @misc{Dwave, title={D-Wave: The Quantum Computing Company}, note={\textit{https://www.dwavesys.com}}} 
@@ -100,24 +107,7 @@ isbn="978-3-319-66167-4"
   
  @misc{GPL, title={GNU General Public License}, note={https://www.gnu.org/licenses/gpl-3.0.html}, journal={&nbsp;[A GNU head]&nbsp;}} 
  
- @InProceedings{varotti,
-author="Bian, Zhengbing
-and Chudak, Fabian
-and Macready, William
-and Roy, Aidan
-and Sebastiani, Roberto
-and Varotti, Stefano",
-editor="Dixon, Clare
-and Finger, Marcelo",
-title="Solving SAT and MaxSAT with a Quantum Annealer: Foundations and a Preliminary Report",
-booktitle="Frontiers of Combining Systems",
-year="2017",
-publisher="Springer International Publishing",
-address="Cham",
-pages="153--171",
-abstract="Quantum annealers (QA) are specialized quantum computers that minimize objective functions over discrete variables by physically exploiting quantum effects. Current QA platforms allow for the optimization of quadratic objectives defined over binary variables, that is, they solve quadratic unconstrained binary optimization (QUBO) problems. In the last decade, QA systems as implemented by D-Wave have scaled with Moore-like growth. Current architectures provide 2048 sparsely-connected qubits, and continued exponential growth is anticipated.",
-isbn="978-3-319-66167-4"
-}
+
 
 @ARTICLE{pa9,
     author = {Stefan Arnborg and Derek G. Corneil and Andrzej Proskurowski},
@@ -287,14 +277,6 @@ doi="10.1007/978-3-642-81955-1_28",
 url="https://doi.org/10.1007/978-3-642-81955-1_28"
 }
 
-@ARTICLE{pa28,
-  author={S. {van der Walt} and S. C. {Colbert} and G. {Varoquaux}},
-  journal={Computing in Science   Engineering}, 
-  title={The NumPy Array: A Structure for Efficient Numerical Computation}, 
-  year={2011},
-  volume={13},
-  number={2},
-  pages={22-30},}
   
   @InProceedings{pa29,
 author="Williams, Poul F.
@@ -312,7 +294,7 @@ pages="124--138",
 isbn="978-3-540-45047-4"
 }
 
- @misc{dwavenetx, title={D-Wave NetworkX}, url={https://docs.ocean.dwavesys.com/projects/dwave-networkx/en/latest/}, journal={D}} 
+ @misc{dwavenetx, title={D-Wave NetworkX}, note={https://docs.ocean.dwavesys.com/projects/dwave-networkx/en/latest/}} 
 
 @article{dpll,
   title={Solving SAT and SAT modulo theories: From an abstract Davis--Putnam--Logemann--Loveland procedure to DPLL (T)},
@@ -356,3 +338,50 @@ edition = "1",
 }
 
  @misc{pyaiger, title={mvcisback/py-aiger}, url={https://github.com/mvcisback/py-aiger}, journal={GitHub}, author={Mvcisback}} 
+ 
+  @misc{advantage, title={D-Wave announces the next generation of its quantum annealer}, url={https://arstechnica.com/science/2019/09/d-wave-announces-the-next-generation-of-its-quantum-annealer/}, journal={Ars Technica}, author={John Timmer    -  Sep 30, 2019 3:02 pm UTC}, year={2019}, month={Sep}} 
+  
+  @article{crypto,
+  author    = {Sebastian E. Schmittner},
+  title     = {A SAT-based public key encryption scheme},
+  journal   = {CoRR},
+  volume    = {abs/1507.08094},
+  year      = {2015},
+  url       = {http://arxiv.org/abs/1507.08094},
+  archivePrefix = {arXiv},
+  eprint    = {1507.08094},
+  timestamp = {Mon, 13 Aug 2018 16:46:29 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/Schmittner15.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{satsec,
+author = {Vanegue, Julien and Heelan, Sean and Rolles, Rolf},
+year = {2012},
+month = {08},
+pages = {9-9},
+title = {SMT solvers for software security}
+}
+
+@article{satsynth,
+author = {Heule, Marijn and Verwer, Sicco},
+year = {2013},
+month = {08},
+pages = {},
+title = {Software model synthesis using satisfiability solvers},
+volume = {18},
+journal = {Empirical Software Engineering},
+doi = {10.1007/s10664-012-9222-z}
+}
+
+ @misc{aiger, note={http://fmv.jku.at/aiger/}, journal={AIGER}} 
+ 
+ @inproceedings{aiplan,
+author = {Kautz, Henry and Selman, Bart},
+year = {1992},
+month = {01},
+pages = {359-363},
+title = {Planning as Satisfiability.}
+}
+
+ @misc{graphviz, title={Graph Visualization Software}, note={https://graphviz.org/}, journal={Graphviz}} 
